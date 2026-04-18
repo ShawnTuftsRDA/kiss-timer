@@ -266,6 +266,36 @@ function showToast(msg) {
 
 // Auto-generate on load
 generate();
+
+function playKissSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // Soft bell chord -- romantic
+    [[523,0],[659,0.1],[784,0.2]].forEach(([freq, delay]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.value = freq;
+      const t = ctx.currentTime + delay;
+      g.gain.setValueAtTime(0.12, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+      o.start(t); o.stop(t + 1.6);
+    });
+    // Little kiss pop -- short noise burst
+    setTimeout(() => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(800, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.08);
+      g.gain.setValueAtTime(0.2, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      o.start(); o.stop(ctx.currentTime + 0.1);
+    }, 600);
+  } catch(e) {}
+}
 </script>
 </body>
 </html>
